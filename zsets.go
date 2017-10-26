@@ -100,4 +100,67 @@ func (client *Client) Zrem(key string, members ...string) (bool, error) {
 	return res.(int64) > 0, nil
 }
 
-// Zremrangebyrank
+// Zremrangebyrank 移除有序集key中，指定排名(rank)区间内的所有成员。
+func (client *Client) Zremrangebyrank(key string, start, stop int) (bool, error) {
+	res, err := client.sendCommand("ZREMRANGEBYRANK", key, strconv.Itoa(start), strconv.Itoa(stop))
+	if err != nil {
+		return false, err
+	}
+
+	return res.(int64) > 0, nil
+}
+
+// Zremrangebyscore 移除有序集key中，所有score值介于min和max之间(包括等于min或max)的成员。
+func (client *Client) Zremrangebyscore(key string, min, max float64) (bool, error) {
+	res, err := client.sendCommand("ZREMRANGEBYSCORE", key, strconv.FormatFloat(min, 'f', -1, 64), strconv.FormatFloat(max, 'f', -1, 64))
+	if err != nil {
+		return false, err
+	}
+
+	return res.(int64) > 0, nil
+}
+
+// Zrevrange 返回有序集key中，指定区间内的成员。其中成员的位置按score值递减(从大到小)来排列。
+func (client *Client) Zrevrange(key string, start, stop int) ([][]byte, error) {
+	res, err := client.sendCommand("ZREVRANGE", key, strconv.Itoa(start), strconv.Itoa(stop))
+	if err != nil {
+		return nil, err
+	}
+
+	return res.([][]byte), nil
+}
+
+// Zrevrangebyscore 返回有序集中指定分数区间内的成员，分数从高到低排序
+func (client *Client) Zrevrangebyscore(key string, max, min float64) ([][]byte, error) {
+	res, err := client.sendCommand("ZREVRANGESCORE", key, strconv.FormatFloat(max, 'f', -1, 64), strconv.FormatFloat(min, 'f', -1, 64))
+	if err != nil {
+		return nil, err
+	}
+
+	return res.([][]byte), nil
+}
+
+// Zrevrank 返回有序集key中成员member的排名 其中有序集成员按score值从大到小排列。排名以0为底，也就是说，score值最大的成员排名为0
+func (client *Client) Zrevrank(key string, member string) (int, error) {
+	res, err := client.sendCommand("ZREVRANK", key, member)
+	if err != nil {
+		return -1, err
+	}
+
+	return int(res.(int64)), nil
+}
+
+// Zscore 返回有序集key中，成员member的score值。
+func (client *Client) Zscore(key, member string) (float64, error) {
+	res, err := client.sendCommand("ZSCORE", key, member)
+	if err != nil {
+		return 0, err
+	}
+
+	data := string(res.([]byte))
+	f, _ := strconv.ParseFloat(data, 64)
+
+	return f, nil
+}
+
+// Zunionstore
