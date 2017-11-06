@@ -36,13 +36,13 @@ func (client *Client) Zcount(key string, min, max float64) (int, error) {
 }
 
 // Zincrby 有序集合中对指定成员的分数加上增量 increment
-func (client *Client) Zincrby(key string, increment float64, member string) (bool, error) {
+func (client *Client) Zincrby(key string, increment float64, member string) (string, error) {
 	res, err := client.sendCommand("ZINCRBY", key, strconv.FormatFloat(increment, 'f', -1, 64), member)
 	if err != nil {
-		return false, err
+		return "", err
 	}
 
-	return res.(int64) == 1, nil
+	return string(res.([]byte)), nil
 }
 
 // Zinterstore 计算给定的一个或多个有序集的交集并将结果集存储在新的有序集合 key 中
@@ -82,7 +82,7 @@ func (client *Client) Zrank(key, member string) (int, error) {
 	res, err := client.sendCommand("ZRANK", key, member)
 
 	if err != nil {
-		return 0, nil
+		return -1, nil
 	}
 
 	return int(res.(int64)), nil
@@ -132,7 +132,7 @@ func (client *Client) Zrevrange(key string, start, stop int) ([][]byte, error) {
 
 // Zrevrangebyscore 返回有序集中指定分数区间内的成员，分数从高到低排序
 func (client *Client) Zrevrangebyscore(key string, max, min float64) ([][]byte, error) {
-	res, err := client.sendCommand("ZREVRANGESCORE", key, strconv.FormatFloat(max, 'f', -1, 64), strconv.FormatFloat(min, 'f', -1, 64))
+	res, err := client.sendCommand("ZREVRANGEBYSCORE", key, strconv.FormatFloat(max, 'f', -1, 64), strconv.FormatFloat(min, 'f', -1, 64))
 	if err != nil {
 		return nil, err
 	}
