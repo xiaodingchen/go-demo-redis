@@ -94,6 +94,13 @@ END:
 	return
 }
 
+// 执行Redis命令，不处理返回结果
+func writeRequest(writer io.Writer, cmd string, args ...string) error {
+	b := commandBytes(cmd, args...)
+	_, err := writer.Write(b)
+	return err
+}
+
 // commandBytes 根据Redis通信协议（请求）组合命令
 // *paramsNum\r\n$param1Len\r\nparam1\r\n$param2Len\r\nparam2\r\n
 func commandBytes(cmd string, args ...string) []byte {
