@@ -40,7 +40,6 @@ func (client *Client) Subscribe(subscribe <-chan string, unscribe <-chan string,
 				cmds <- []string{cmd, channel}
 			}
 		}
-
 		close(cmds)
 		close(data)
 	}()
@@ -70,6 +69,7 @@ func (client *Client) Subscribe(subscribe <-chan string, unscribe <-chan string,
 				// log.Printf("Unknown message '%s'", messageType)
 			}
 		}
+
 	}()
 	err := client.sendCommands(cmds, data)
 
@@ -77,6 +77,7 @@ func (client *Client) Subscribe(subscribe <-chan string, unscribe <-chan string,
 }
 
 func (client *Client) sendCommands(cmds <-chan []string, data chan<- interface{}) (err error) {
+
 	c, err := client.popCon()
 	var reader *bufio.Reader
 	var pong interface{}
